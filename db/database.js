@@ -24,7 +24,7 @@ db.prepare(`
     id              TEXT        PRIMARY KEY,                    
     item_name       TEXT        NOT NULL,
     description     TEXT        NOT NULL,
-    quantity        INTEGER     NOT NULL DEFAULT 0,
+    quantity        INTEGER     NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     price           REAL        NOT NULL,
     image_url       TEXT,                                       -- Optional image path
     package_type_id INTEGER,                                    
