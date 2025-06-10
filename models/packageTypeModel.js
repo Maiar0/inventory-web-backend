@@ -1,12 +1,23 @@
 const db = require('../db/database');
 
 function addPackageType(type) {
-  const stmt = db.prepare('INSERT INTO package_types (type) VALUES (?)');
-  return stmt.run( type);//TODO:: Not correct we will allow autoincrememt integer here
+  const stmt = db.prepare(`
+    INSERT OR IGNORE INTO package_types (type)
+    VALUES (?)
+  `);
+  return stmt.run(type);
 }
 
 function getAllPackageTypes() {
   return db.prepare('SELECT * FROM package_types').all();
 }
 
-module.exports = { addPackageType, getAllPackageTypes };
+function getPackageTypeById(id) {
+  return db.prepare('SELECT * FROM package_types WHERE id = ?').get(id);
+}
+
+module.exports = {
+  addPackageType,
+  getAllPackageTypes,
+  getPackageTypeById,
+};

@@ -1,15 +1,34 @@
-// models/inventoryModel.js
-
 const db = require('../db/database');
 
-function getAllItems() {
-  const stmt = db.prepare('SELECT * FROM inventory');
-  return stmt.all();
+function addInventoryItem({ id, item_name, description, quantity, price, image_url, package_type_id, package_count }) {
+  const stmt = db.prepare(`
+    INSERT INTO inventory_items (
+      id, item_name, description, quantity, price, image_url, package_type_id, package_count
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  return stmt.run(
+    id,
+    item_name,
+    description,
+    quantity,
+    price,
+    image_url,
+    package_type_id,
+    package_count
+  );
 }
 
-function addItem(item_name, quantity = 0) {
-  const stmt = db.prepare('INSERT INTO inventory (item_name, quantity) VALUES (?, ?)');
-  return stmt.run(item_name, quantity);
+function getAllInventoryItems() {
+  return db.prepare('SELECT * FROM inventory_items').all();
 }
 
-module.exports = { getAllItems, addItem };
+function getInventoryItemById(id) {
+  return db.prepare('SELECT * FROM inventory_items WHERE id = ?').get(id);
+}
+
+module.exports = {
+  addInventoryItem,
+  getAllInventoryItems,
+  getInventoryItemById,
+};
