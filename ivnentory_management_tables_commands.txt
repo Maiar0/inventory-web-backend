@@ -1,0 +1,126 @@
+-- Products (master catalog)
+CREATE TABLE products (
+    product_id    SERIAL PRIMARY KEY,
+    sku           TEXT     UNIQUE NOT NULL,
+    name          TEXT     NOT NULL,
+    description   TEXT,
+    unit_cost     NUMERIC(10,2) NOT NULL,
+    unit_price    NUMERIC(10,2) NOT NULL,
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Purchase Invoices
+CREATE TABLE invoices (
+    invoice_id       SERIAL PRIMARY KEY,
+    supplier_id      UUID     NOT NULL,
+    invoice_date     DATE     NOT NULL DEFAULT CURRENT_DATE,
+    shipping_method  TEXT,
+    shipping_cost    NUMERIC(10,2) NOT NULL DEFAULT 0,
+    tax_rate         NUMERIC(5,2)  NOT NULL DEFAULT 0,
+    tax_amount       NUMERIC(12,2) NOT NULL DEFAULT 0,
+    invoice_total    NUMERIC(12,2) NOT NULL,
+    created_by       UUID     NOT NULL,
+    created_at       TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Invoice Line-Items
+CREATE TABLE invoice_items (
+    invoice_item_id  SERIAL PRIMARY KEY,
+    invoice_id       INTEGER NOT NULL REFERENCES invoices(invoice_id) ON DELETE CASCADE,
+    product_id       INTEGER NOT NULL REFERENCES products(product_id),
+    quantity         INTEGER NOT NULL CHECK (quantity > 0),
+    unit_cost        NUMERIC(10,2) NOT NULL,
+    line_total       NUMERIC(12,2) GENERATED ALWAYS AS (quantity * unit_cost) STORED
+);
+
+-- Customer Orders
+CREATE TABLE orders (
+    order_id      SERIAL PRIMARY KEY,
+    customer_id   UUID     NOT NULL,
+    order_date    DATE     NOT NULL DEFAULT CURRENT_DATE,
+    status        TEXT     NOT NULL CHECK (status IN ('pending','shipped','cancelled','complete')),
+    order_total   NUMERIC(12,2) NOT NULL,
+    created_by    UUID     NOT NULL,
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Order Line-Items
+CREATE TABLE order_items (
+    order_item_id   SERIAL PRIMARY KEY,
+    order_id        INTEGER NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    product_id      INTEGER NOT NULL REFERENCES products(product_id),
+    quantity        INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price      NUMERIC(10,2) NOT NULL,
+    line_total      NUMERIC(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED
+);
+
+-- Manual Stock Adjustments
+CREATE TABLE stock_adjustments (
+    adjustment_id   SERIAL PRIMARY KEY,
+    product_id      INTEGER NOT NULL REFERENCES products(product_id),
+    change_qty      INTEGER NOT NULL,
+    reason          TEXT    NOT NULL,
+    created_by      UUID    NOT NULL,
+    adjustment_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    comments        TEXT
+);
+
+-- Returns (customer returns)
+CREATE TABLE returns (
+    return_id     SERIAL PRIMARY KEY,
+    order_id      INTEGER NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    return_date   DATE    NOT NULL DEFAULT CURRENT_DATE,
+    return_total  NUMERIC(12,2) NOT NULL,
+    created_by    UUID    NOT NULL,
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Return Line-Items
+CREATE TABLE return_items (
+    return_item_id  SERIAL PRIMARY KEY,
+    return_id       INTEGER NOT NULL REFERENCES returns(return_id) ON DELETE CASCADE,
+    product_id      INTEGER NOT NULL REFERENCES products(product_id),
+    quantity        INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price      NUMERIC(10,2) NOT NULL,
+    line_total      NUMERIC(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED
+);
+
+-- Completed Orders (finalized)
+CREATE TABLE completed_orders (
+    order_id        INTEGER PRIMARY KEY
+                     REFERENCES orders(order_id) 
+                     ON DELETE CASCADE,
+    completed_date  TIMESTAMP WITH TIME ZONE NOT NULL 
+                     DEFAULT now(),
+    finalized_by    UUID     NOT NULL,    -- user who completed the order
+    comments        TEXT                  -- any notes on completion
+);
+
+-- Completed Order Line‐Items
+CREATE TABLE completed_order_items (
+    completed_item_id  SERIAL   PRIMARY KEY,
+    order_id           INTEGER  NOT NULL
+                          REFERENCES completed_orders(order_id)
+                          ON DELETE CASCADE,
+    product_id         INTEGER  NOT NULL
+                          REFERENCES products(product_id),
+    quantity           INTEGER  NOT NULL
+                          CHECK (quantity > 0),
+    unit_price         NUMERIC(10,2) NOT NULL,  
+    line_total         NUMERIC(12,2) 
+                          GENERATED ALWAYS AS (quantity * unit_price) STORED
+);
+
+
+-- Stock Movements (ledger with cost & price)
+CREATE TABLE stock_movements (
+    movement_id     SERIAL PRIMARY KEY,
+    product_id      INTEGER NOT NULL REFERENCES products(product_id),
+    change_qty      INTEGER NOT NULL,
+    source_table    TEXT    NOT NULL CHECK (source_table IN ('invoice','completed_order','adjustment')),
+    source_id       INTEGER NOT NULL,
+    movement_date   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    unit_cost       NUMERIC(10,2),
+    unit_price      NUMERIC(10,2)
+);

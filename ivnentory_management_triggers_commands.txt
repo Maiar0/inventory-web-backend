@@ -1,0 +1,100 @@
+-- Stock Movements (ledger with cost & price)
+CREATE TABLE stock_movements (
+    movement_id     SERIAL PRIMARY KEY,
+    product_id      INTEGER NOT NULL REFERENCES products(product_id),
+    change_qty      INTEGER NOT NULL,
+    source_table    TEXT    NOT NULL CHECK (source_table IN ('invoice','completed_order','adjustment')),
+    source_id       INTEGER NOT NULL,
+    movement_date   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    unit_cost       NUMERIC(10,2),
+    unit_price      NUMERIC(10,2)
+);
+
+-- Trigger: on INSERT to invoice_items → record receipt at unit_cost
+CREATE OR REPLACE FUNCTION fn_stock_from_invoice_items() RETURNS trigger AS $$
+BEGIN
+  INSERT INTO stock_movements (
+    product_id,
+    change_qty,
+    source_table,
+    source_id,
+    movement_date,
+    unit_cost,
+    unit_price
+  ) VALUES (
+    NEW.product_id,
+    NEW.quantity,
+    'invoice',
+    NEW.invoice_id,
+    now(),
+    NEW.unit_cost,
+    NULL
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_invoice_items_stock
+AFTER INSERT ON invoice_items
+FOR EACH ROW
+EXECUTE FUNCTION fn_stock_from_invoice_items();
+
+
+-- Trigger: on INSERT to completed_order_items → record issue at unit_price
+CREATE OR REPLACE FUNCTION fn_stock_from_completed_order_items() RETURNS trigger AS $$
+BEGIN
+  INSERT INTO stock_movements (
+    product_id,
+    change_qty,
+    source_table,
+    source_id,
+    movement_date,
+    unit_cost,
+    unit_price
+  ) VALUES (
+    NEW.product_id,
+    -NEW.quantity,
+    'completed_order',
+    NEW.order_id,
+    now(),
+    NULL,
+    NEW.unit_price
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_completed_order_items_stock
+AFTER INSERT ON completed_order_items
+FOR EACH ROW
+EXECUTE FUNCTION fn_stock_from_completed_order_items();
+
+
+-- Trigger: on INSERT to stock_adjustments → record manual adjustment
+CREATE OR REPLACE FUNCTION fn_stock_from_adjustments() RETURNS trigger AS $$
+BEGIN
+  INSERT INTO stock_movements (
+    product_id,
+    change_qty,
+    source_table,
+    source_id,
+    movement_date,
+    unit_cost,
+    unit_price
+  ) VALUES (
+    NEW.product_id,
+    NEW.change_qty,
+    'adjustment',
+    NEW.adjustment_id,
+    now(),
+    NULL,
+    NULL
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_adjustments_stock
+AFTER INSERT ON stock_adjustments
+FOR EACH ROW
+EXECUTE FUNCTION fn_stock_from_adjustments();
