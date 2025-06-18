@@ -4,6 +4,7 @@ CREATE TABLE products (
     sku           TEXT     UNIQUE NOT NULL,
     name          TEXT     NOT NULL,
     description   TEXT,
+    image_url     TEXT,
     unit_cost     NUMERIC(10,2) NOT NULL,
     unit_price    NUMERIC(10,2) NOT NULL,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT now(),

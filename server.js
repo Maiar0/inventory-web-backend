@@ -4,8 +4,6 @@ const path = require('path');
 
 const PORT = process.env.PORT || 5000;
 
-// DB initialized on import
-require('./db/database');
 
 const userRoutes = require('./routes/userRoutes');
 
