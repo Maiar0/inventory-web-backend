@@ -51,6 +51,17 @@ class InvoiceModel {
         }
         return data;
     }
+    async update(invoice_id, updates) {
+        const { data, error, status } = await supabase
+            .from(this.table)
+            .update(updates)
+            .eq('invoice_id', invoice_id)
+            .single();
+        if (error && status !== 406) {
+            throw new Error(`Error ${status}: ${error.message}`);
+        }
+        return data;
+    }
     /**
      * Retrieves a paginated list of records from the database table.
      *
