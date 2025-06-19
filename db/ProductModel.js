@@ -19,15 +19,16 @@ class ProductModel {
    * @returns {Promise<object>} inserted row
    */
   async create(product) {
-    const { data, error, status } = await supabase
+    const { data, error, status } = supabase
       .from(this.table)
       .insert([ product ])
-      .single();// data is a single object of single item inserted;
-
-    if (error) {
-      throw new Error(`Error ${status}: ${error.message}`);
-    }
-    return data;
+      .single()
+      .then(({ data, error, status }) => {
+        if (error) {
+          throw new Error(`Error ${status}: ${error.message}`);
+        }
+        return { data, error, status };
+      });
   }
 
   /**

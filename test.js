@@ -11,6 +11,6 @@ const created = await db.create({
     unit_cost: 0,
     unit_price: 0
 });
-//const find = await db.findById(productId);
-//const update = db.update(productId, {name: 'new Gecko'});
+const find = await db.findById(productId);
+const update = db.update(productId, {name: 'new Gecko'});
 const del = db.deleteById(productId);

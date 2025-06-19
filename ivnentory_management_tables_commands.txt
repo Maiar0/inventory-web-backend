@@ -13,16 +13,17 @@ CREATE TABLE products (
 
 -- Purchase Invoices
 CREATE TABLE invoices (
-    invoice_id       SERIAL PRIMARY KEY,
-    supplier_id      UUID     NOT NULL,
-    invoice_date     DATE     NOT NULL DEFAULT CURRENT_DATE,
-    shipping_method  TEXT,
-    shipping_cost    NUMERIC(10,2) NOT NULL DEFAULT 0,
-    tax_rate         NUMERIC(5,2)  NOT NULL DEFAULT 0,
-    tax_amount       NUMERIC(12,2) NOT NULL DEFAULT 0,
-    invoice_total    NUMERIC(12,2) NOT NULL,
-    created_by       UUID     NOT NULL,
-    created_at       TIMESTAMP WITH TIME ZONE DEFAULT now()
+    invoice_id          SERIAL PRIMARY KEY,
+    supplier_id         UUID     NOT NULL,
+    supplier_invoice_id TEXT UNIQUE NOT NULL,
+    invoice_date        DATE     NOT NULL DEFAULT CURRENT_DATE,
+    shipping_method     TEXT,
+    shipping_cost       NUMERIC(10,2) NOT NULL DEFAULT 0,
+    tax_rate            NUMERIC(5,2)  NOT NULL DEFAULT 0,
+    tax_amount          NUMERIC(12,2) NOT NULL DEFAULT 0,
+    invoice_total       NUMERIC(12,2) NOT NULL,
+    created_by          UUID     NOT NULL,
+    created_at          TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Invoice Line-Items
