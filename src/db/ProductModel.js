@@ -1,5 +1,3 @@
-// productModel.js
-
 const { supabase } = require('./client.js')
 
 class ProductModel {
