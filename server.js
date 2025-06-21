@@ -1,18 +1,23 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const path = require('path');
 
 const PORT = process.env.PORT || 5000;
 
-
-const userRoutes = require('./routes/userRoutes');
-
+//middleware
+app.use(cors());
 app.use(express.json());
 
+
 // Mount routes
-app.use('/api/users', userRoutes);
+const navRoutes = require('./routes/navRoutes');
+app.use('/nav', navRoutes);
+
 app.use('/images', express.static(path.join(__dirname, 'public/images')));//server images static
 
+
+//start rest server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

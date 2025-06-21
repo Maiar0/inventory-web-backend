@@ -48,6 +48,18 @@ class ProductModel {
     }
     return data;
   }
+  async findBySku(sku) {
+    const { data, error, status } = await supabase
+      .from(this.table)
+      .select('*')
+      .eq('sku', sku)
+      .single();
+
+    if (error && status !== 406) {
+      throw new Error(`Error ${status}: ${error.message}`);
+    }
+    return data;
+  }
 
   /**
    * List all products, optionally with pagination.

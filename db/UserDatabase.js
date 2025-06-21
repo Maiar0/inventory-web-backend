@@ -1,93 +1,59 @@
-const sqlite3 = require('sqlite3').verbose();
-const { open } = require('sqlite');
-//Shortcuts some basic authorization
+const path = require('path');
+const Database = require('better-sqlite3');
+
 class UserDatabase {
-    constructor(dbFilePath) {
-        this.dbFilePath = dbFilePath;
-        this.db = null;
-    }
+  constructor() {
+    const dbPath = path.join(__dirname, '../databases/users.db');
+    this.db = new Database(dbPath);
 
-    // Open the database connection
-    async connect() {
-        this.db = await open({
-            filename: this.dbFilePath,
-            driver: sqlite3.Database
-        });
-    }
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS users (
+        uuid TEXT PRIMARY KEY,
+        role TEXT NOT NULL CHECK (role IN ('root','admin','user'))
+      );
+    `);
 
-    // Initialize schema and seed the root user
-    async initSchema() {
-        // Create the users table
-        await this.db.exec(`
-            CREATE TABLE IF NOT EXISTS users (
-                uuid TEXT PRIMARY KEY,
-                role TEXT NOT NULL CHECK (role IN ('root','admin','user'))
-            );
-        `);
+    this.db.prepare(`
+      INSERT OR IGNORE INTO users (uuid, role)
+      VALUES ('53192e68-ef7e-4a09-9ad6-c8e222e58085', 'root');
+    `).run();
+  }
 
-        // Insert the initial root user, ignoring if already present
-        await this.db.run(`
-            INSERT OR IGNORE INTO users (uuid, role)
-            VALUES ('53192e68-ef7e-4a09-9ad6-c8e222e58085', 'root');
-        `);
-    }
+  addUser(uuid, role) {
+    const stmt = this.db.prepare(`
+      INSERT INTO users (uuid, role)
+      VALUES (?, ?)
+    `);
+    return stmt.run(uuid, role);
+  }
 
-    // Add a new user
-    async addUser(uuid, role) {
-        return this.db.run(`
-            INSERT INTO users (uuid, role)
-            VALUES (?, ?);
-        `, [uuid, role]);
-    }
+  getUser(uuid) {
+    const stmt = this.db.prepare(`
+      SELECT uuid, role FROM users WHERE uuid = ?
+    `);
+    console.log(`Fetching user with UUID: ${uuid}`);
+    return stmt.get(uuid);
+  }
 
-    // Retrieve a user by UUID
-    async getUser(uuid) {
-        return this.db.get(`
-            SELECT uuid, role
-            FROM users
-            WHERE uuid = ?;
-        `, [uuid]);
-    }
+  listUsers() {
+    return this.db.prepare(`
+      SELECT uuid, role FROM users
+    `).all();
+  }
 
-    // List all users
-    async listUsers() {
-        return this.db.all(`
-            SELECT uuid, role
-            FROM users;
-        `);
-    }
+  hasRole(uuid, role) {
+    const row = this.db.prepare(`
+      SELECT role FROM users WHERE uuid = ?
+    `).get(uuid);
 
-    // Close the database connection
-    async close() {
-        await this.db.close();
-    }
+    if (!row) return false;
+    if (row.role === 'root') return true;
+    return row.role === role;
+  }
 
-    /**
-     * Check if a user has the given role (with 'root' as a super-role).
-     * @param {string} uuid  - The user's UUID.
-     * @param {string} role  - The role to verify ('root', 'admin', 'user').
-     * @returns {Promise<boolean>}
-     */
-    async hasRole(uuid, role) {
-        const row = await this.db.get(`
-            SELECT role
-              FROM users
-             WHERE uuid = ?;
-        `, [uuid]);
-
-        if (!row) {
-            // No such user
-            return false;
-        }
-
-        if (row.role === 'root') {
-            // 'root' has all permissions
-            return true;
-        }
-
-        // Otherwise, only match exact role
-        return row.role === role;
-    }
+  close() {
+    this.db.close();
+  }
 }
 
-module.exports = UserDatabase;
+module.exports = UserDatabase
