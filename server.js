@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Mount routes
 const navRoutes = require('./routes/navRoutes');
-app.use('/nav', navRoutes);
+app.use('/api/nav', navRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'public/images')));//server images static
 

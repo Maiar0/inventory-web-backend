@@ -15,7 +15,7 @@ class UserDatabase {
 
     this.db.prepare(`
       INSERT OR IGNORE INTO users (uuid, role)
-      VALUES ('53192e68-ef7e-4a09-9ad6-c8e222e58085', 'root');
+      VALUES ('c255b785-404e-4d0f-9a5b-6ed787b2ad71', 'root');
     `).run();
   }
 

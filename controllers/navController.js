@@ -2,9 +2,9 @@ const NavService = require('../service/NavService');
 const LogSession = require('../utils/logging/LogSession');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
-
+//'c255b785-404e-4d0f-9a5b-6ed787b2ad71'//
 exports.getHome = async (req, res) => {
-    const userId = '53192e68-ef7e-4a09-9ad6-c8e222e58085'//req.user.uuid; // pretend we are root always for now
+    const userId = req.user.uuid; // pretend we are root always for now
     const log = new LogSession(userId);
   try {
     const data = await NavService.getHomeData(userId);
