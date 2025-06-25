@@ -4,5 +4,6 @@ const navController = require('../controllers/navController');
 const verifySupabaseToken = require('../middleware/auth'); // Uncomment if you want to use the token verification middleware
 
 router.get('/home', verifySupabaseToken, navController.getHome);
+router.get('/*path', verifySupabaseToken, navController.getNavigation);
 
 module.exports = router; 

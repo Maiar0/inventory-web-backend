@@ -1,5 +1,5 @@
 const UserDatabase = require('../db/UserDatabase');
-const { USER_NAVIGATION, ADMIN_NAVIGATION } = require('./structs/HomeNav');
+const { baseNavigation, adminNavigation } = require('./structs/HomeNav');
 
 class NavService {
   async getHomeData(userId) {
@@ -12,15 +12,36 @@ class NavService {
         throw new Error('User not found');
       }else if (role === 'admin' || role === 'root') {
         // Return admin navigation
-        return ADMIN_NAVIGATION;
+        return adminNavigation;
       } else if( role === 'user') {
         // Return user navigation
-        return USER_NAVIGATION;
+        return baseNavigation;
       }
 
     } catch (error) {
       console.error('Error fetching home data:', error);
       throw new Error('Failed to fetch home data');
+    }
+  }
+  async getNavigation(userId, path){
+    const db = new UserDatabase();
+    try{
+      const role = await db.getUser(userId).role;
+      if (!role) {
+        throw new Error('User not found');
+      }else if (role === 'admin' || role === 'root') {
+        // Return admin navigation
+        return adminNavigation[path.join('/')];
+      } else if( role === 'user') {
+        // Return user navigation
+        return baseNavigation[path.join('/')];
+      }
+
+    }catch(err){
+      console.error('Error fetching home data:', error);
+      throw new Error('Failed to fetch home data');
+    }finally{
+
     }
   }
 }

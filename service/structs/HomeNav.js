@@ -1,35 +1,34 @@
-// Base navigation for regular users
-const USER_NAVIGATION = [
-  {
-    name: 'Inventory',
-    description: 'View available inventory',
-    route: '/inventory'
-  },
-  {
-    name: 'Reports',
-    description: 'View your activity reports',
-    route: '/reports'
-  }
-];
+const baseNavigation = {
+  '': [
+    { name: 'Inventory', description: 'Browse and manage inventory', route: '/dashboard/inventory', roles: ['user', 'admin'] }
+  ],
+  'inventory': [
+    { name: 'Catalog', description: 'View available products', route: '/dashboard/inventory/catalog', roles: ['user', 'admin'] }
+  ]
+};
 
-// Admin-only items
-const ADMIN_PRIVILEGED_NAV = [
-  {
-    name: 'Users',
-    description: 'Administer user accounts and roles',
-    route: '/users'
-  },
-  {
-    name: 'Settings',
-    description: 'Configure application settings',
-    route: '/settings'
-  }
-];
+const adminNavigation = {
+  '': [
+    ...baseNavigation[''],
+    { name: 'Reports', description: 'View administrative reports', route: '/dashboard/reports', roles: ['admin'] }
+  ],
+  'inventory': [
+    ...baseNavigation['inventory'],
+    { name: 'Stock Control', description: 'Manage stock levels and restocks', route: '/dashboard/inventory/stock', roles: ['admin'] }
+  ],
+  'inventory/catalog': [
+    { name: 'Create Item', description: 'Add new catalog item', route: '/dashboard/inventory/catalog/create', roles: ['admin'] }
+  ]
+};
 
-// Full admin navigation = user items + admin items
-const ADMIN_NAVIGATION = [...USER_NAVIGATION, ...ADMIN_PRIVILEGED_NAV];
+const futureNavigation = {
+  '': [
+    { name: 'Purchase from Catalog', description: 'End-user purchase portal (inactive)', route: '/dashboard/purchase', roles: ['user', 'admin'] }
+  ]
+};
 
 module.exports = {
-  USER_NAVIGATION,
-  ADMIN_NAVIGATION
+  baseNavigation,
+  adminNavigation,
+  futureNavigation
 };
