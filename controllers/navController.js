@@ -20,16 +20,16 @@ exports.getHome = async (req, res) => {
 }
 exports.getNavigation = async (req,res) => {
   const path = req.params.path;
-  console.log(path)
   const userId = req.user.uuid;
   const log = new LogSession(userId);
   try {
     const data = await NavService.getNavigation(userId, path);
-    console.log('Fetched home data:', path, data);
-    log.addEvent('getHome', 'Fetched home data successfully', { userId, path, data });
+    const logPath = path || '/';
+    console.log('Fetched nav data:', logPath, data);
+    log.addEvent('getHome', 'Fetched nav data successfully', { userId, logPath, data });
     return res.json(ApiResponse.success(data));
   } catch (error) {
-    console.error('Error fetching home data:', error);
+    console.error('Error fetching nav data:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }finally {
     log.writeToFile();

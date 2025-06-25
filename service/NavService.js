@@ -24,6 +24,8 @@ class NavService {
     }
   }
   async getNavigation(userId, path){
+    if(!path){ path = ''}else{path = path.join('/')}
+    console.log('Path:', path)
     const db = new UserDatabase();
     try{
       const role = await db.getUser(userId).role;
@@ -31,14 +33,14 @@ class NavService {
         throw new Error('User not found');
       }else if (role === 'admin' || role === 'root') {
         // Return admin navigation
-        return adminNavigation[path.join('/')];
+        return adminNavigation[path];
       } else if( role === 'user') {
         // Return user navigation
-        return baseNavigation[path.join('/')];
+        return baseNavigation[path];
       }
 
     }catch(err){
-      console.error('Error fetching home data:', error);
+      console.error('Error fetching home data:', err);
       throw new Error('Failed to fetch home data');
     }finally{
 

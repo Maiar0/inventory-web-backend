@@ -1,29 +1,29 @@
 const baseNavigation = {
   '': [
-    { name: 'Inventory', description: 'Browse and manage inventory', route: '/dashboard/inventory', roles: ['user', 'admin'] }
+    { name: 'Inventory', description: 'Browse and manage inventory', route: '/inventory' }
   ],
   'inventory': [
-    { name: 'Catalog', description: 'View available products', route: '/dashboard/inventory/catalog', roles: ['user', 'admin'] }
+    { name: 'Catalog', description: 'View available products', route: '/inventory/catalog' }
   ]
 };
 
 const adminNavigation = {
   '': [
     ...baseNavigation[''],
-    { name: 'Reports', description: 'View administrative reports', route: '/dashboard/reports', roles: ['admin'] }
+    { name: 'Reports', description: 'View administrative reports', route: '/reports' }
   ],
   'inventory': [
     ...baseNavigation['inventory'],
-    { name: 'Stock Control', description: 'Manage stock levels and restocks', route: '/dashboard/inventory/stock', roles: ['admin'] }
+    { name: 'Stock Control', description: 'Manage stock levels and restocks', route: '/inventory/stock' }
   ],
   'inventory/catalog': [
-    { name: 'Create Item', description: 'Add new catalog item', route: '/dashboard/inventory/catalog/create', roles: ['admin'] }
+    { name: 'Create Item', description: 'Add new catalog item', route: '/inventory/catalog/create' }
   ]
 };
 
 const futureNavigation = {
   '': [
-    { name: 'Purchase from Catalog', description: 'End-user purchase portal (inactive)', route: '/dashboard/purchase', roles: ['user', 'admin'] }
+    { name: 'Purchase from Catalog', description: 'End-user purchase portal (inactive)', route: '/purchase' }
   ]
 };
 
