@@ -7,6 +7,15 @@ const baseNavigation = {
   ]
 };
 
+const viewNavigation = {
+  '': [
+    { name: 'Inventory', description: 'Browse and manage inventory', route: '/inventory' }
+  ],
+  'inventory': [
+    { name: 'Catalog', description: 'View available products', route: '/inventory/catalog' }
+  ]
+};
+
 const adminNavigation = {
   '': [
     ...baseNavigation[''],

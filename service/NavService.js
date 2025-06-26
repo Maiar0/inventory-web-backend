@@ -1,5 +1,5 @@
 const UserDatabase = require('../db/UserDatabase');
-const { baseNavigation, adminNavigation } = require('./structs/HomeNav');
+const { baseNavigation, adminNavigation } = require('./structs/DashboardNav');
 
 class NavService {
   async getHomeData(userId) {
