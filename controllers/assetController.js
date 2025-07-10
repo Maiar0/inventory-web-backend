@@ -29,7 +29,7 @@ exports.getAssets = async (req, res) => {
         const files = await fs.promises.readdir(imagesDir);
         const assets = files.map(file => ({
             name: file,
-            url: `/images/${file}`
+            image_url: `/images/${file}`
         }));
         log.addEvent('getAssets', 'Assets fetched successfully', { userId, assets });
         return res.json(ApiResponse.success(assets));
