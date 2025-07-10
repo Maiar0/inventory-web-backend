@@ -5,30 +5,18 @@ class ProductModel {
     this.table = 'products';
   }
 
-  /**
-   * Insert a new product.
-   * @param {{ 
-   *   product_id: string,
-   *   sku: string,
-   *   name: string,
-   *   description?: string,
-   *   unit_cost: number,
-   *   unit_price: number,
-   *   image_url?: string
-   * }} product
-   * @returns {Promise<object>} inserted row
-   */
+  
   async create(product) {
-    const { data, error, status } = supabase
+    const { data, error, status } = await supabase
       .from(this.table)
-      .insert([ product ])
-      .single()
-      .then(({ data, error, status }) => {
-        if (error) {
-          throw new Error(`Error ${status}: ${error.message}`);
-        }
-        return { data, error, status };
-      });
+      .insert([product])
+      .single();
+
+    if (error) {
+      throw new Error(`Error ${status}: ${error.message}`);
+    }
+
+    return data;
   }
 
   /**

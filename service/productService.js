@@ -1,4 +1,4 @@
-const ProductModel = require('../models/productModel');
+const ProductModel = require('../db/ProductModel');
 
 class ProductService {
     constructor(log) {
@@ -17,4 +17,9 @@ class ProductService {
         this.log.addEvent(`Deleting product ${product_id}`);
         return this.db.deleteById(product_id);
     }
+    getById(product_id) {
+        this.log.addEvent(`Fetching product by ID: ${product_id}`);
+        return this.db.findById(product_id);
+    }
 }
+module.exports = ProductService;
