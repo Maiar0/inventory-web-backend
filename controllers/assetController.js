@@ -6,7 +6,7 @@ const ApiError = require('../utils/ApiError');
 const upload = require('../middleware/multerConfig');
 
 exports.uploadAsset = [
-    upload.single('image'), 
+    upload.single('asset'), 
     async (req, res) => {
         try{
             if(!req.file) {
