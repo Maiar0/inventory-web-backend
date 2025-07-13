@@ -21,5 +21,9 @@ class ProductService {
         this.log.addEvent(`Fetching product by ID: ${product_id}`);
         return this.db.findById(product_id);
     }
+    getAll({ page, perPage } = {}) {
+        this.log.addEvent(`Fetching all products with pagination: page=${page}, perPage=${perPage}`);
+        return this.db.list({ page, perPage });
+    }
 }
 module.exports = ProductService;

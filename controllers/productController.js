@@ -40,3 +40,19 @@ exports.getProductById = async (req, res) => {
         log.writeToFile();
     }
 }
+exports.getProducts = async(req, res) => {
+    const userId = req.user.uuid;
+    const log = new LogSession(userId);
+    try {
+        const productService = new ProductService(log);
+        const products = await productService.getAll();
+        log.addEvent('getProducts', 'Fetched all products successfully', { userId });
+        return res.json(ApiResponse.success(products));
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        log.addEvent('getProducts', 'Error fetching products', { error: error.message });
+        res.status(500).json(ApiResponse.error(new ApiError('Internal Server Error', 500)));
+    } finally {
+        log.writeToFile();
+    }
+}
