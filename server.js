@@ -17,6 +17,8 @@ const productRoutes = require('./routes/productRoutes');
 app.use('/api/product', productRoutes);
 const assetRoutes = require('./routes/assetRoutes');
 app.use('/api/asset', assetRoutes);
+const invoiceRoutes = require('./routes/invoiceRoutes');
+app.use('/api/invoice', invoiceRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'public/images')));//server images static
 

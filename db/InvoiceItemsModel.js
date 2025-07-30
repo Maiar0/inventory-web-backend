@@ -11,7 +11,7 @@ class InvoiceItemModel {
      * @param {{ 
      *   invoice_item_id?: number,   // optional if auto-generated
      *   invoice_id: number,         // ID of the parent invoice
-     *   product: number,            // ID of the product being invoiced
+     *   product_id: number,            // ID of the product being invoiced
      *   quantity: number,           // number of units sold
      *   unit_cost: number,          // cost per unit at time of invoicing
      *   line_total: number          // total for this line (quantity * unit_cost)
@@ -20,17 +20,19 @@ class InvoiceItemModel {
      * @throws {Error}                If the insert fails, with HTTP status and message
      */
     async create(item) {
-        const { data, error, status } = supabase
+        const { data, error, status } = await supabase
             .from(this.table)
             .insert([item])
-            .single()
-            .then(({ data, error, status }) => {
-                if (error) {
-                    throw new Error(`Error ${status}: ${error.message}`);
-                }
-                return { data, error, status };
-      });
+            .select()
+            .single();
+
+        if (error) {
+            throw new Error(`Error ${status}: ${error.message}`);
+        }
+
+        return data;
     }
+
     async findById(invoice_item_id) {
         const { data, error, status } = await supabase
             .from(this.table)
@@ -90,3 +92,4 @@ class InvoiceItemModel {
         return data;
     }
 }
+module.exports = InvoiceItemModel;

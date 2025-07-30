@@ -26,10 +26,12 @@ class InvoiceModel {
         const { data, error, status } = await supabase
             .from(this.table)
             .insert([invoice])
-            .single();
+            .single()
+            .select();
         if (error) {
             throw new Error(`Error ${status}: ${error.message}`);
         }
+        console.log('Invoice created with ID:', data, error, status);
         return data;
     }
     /**
@@ -96,3 +98,4 @@ class InvoiceModel {
         return data;
     }
 }
+module.exports = InvoiceModel;
