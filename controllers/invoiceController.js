@@ -13,7 +13,7 @@ exports.createInvoice = async (req, res) => {
         console.log('Creating invoice for user:', userId, 'with data:', invoice, invoiceItems);
         const createInvoice = await invoiceService.create(userId, invoice, invoiceItems);
         log.addEvent('createInvoice', 'Invoice created successfully', { userId, invoice: createInvoice });
-        return res.json(ApiResponse.success(createInvoice));
+        return res.json(ApiResponse.success({invoice_id: createInvoice.invoice.invoice_id}));
     } catch (error) {
         console.error('Error creating invoice:', error);
         log.addEvent('createInvoice', 'Error creating invoice', { error: error.message });
