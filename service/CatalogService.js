@@ -10,7 +10,7 @@ class CatalogService {
 
     async getAll({page, perPage} = {}) {
         this.log.addEvent(`Fetching all products with pagination: page=${page}, perPage=${perPage}`);
-        return this.productDb.list({ page, perPage });
+        return await this.productDb.list({ page, perPage });
     }
 }   
 module.exports = CatalogService
